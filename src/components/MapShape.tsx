@@ -6,6 +6,8 @@ import {
   TLResizeInfo,
   getDefaultColorTheme,
   resizeBox,
+  Vec,
+  VecLike,
 } from "@tldraw/tldraw";
 import { IMapShape, MapShapeProps } from "./map-shape-types";
 import { mapShapeProps } from "./map-shape-props";
@@ -15,7 +17,7 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
   static type = "map" as const;
   static props = mapShapeProps;
 
-  canBind = () => false;
+  canBind = () => true;
   canEdit = () => true;
   canResize = () => true;
   canRotate = () => false;
@@ -35,6 +37,31 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
       height: shape.props.h,
       isFilled: true,
     });
+  }
+
+  getOutline(shape: IMapShape) {
+    const bounds = this.editor.getShapeGeometry(shape).bounds;
+    const { w, h } = bounds;
+
+    // Define points on the outline where arrows can snap to
+    return [
+      // Center points of each edge
+      Vec.Med(bounds.point, Vec.Add(bounds.point, new Vec(w, 0))), // Top center
+      Vec.Med(
+        Vec.Add(bounds.point, new Vec(w, 0)),
+        Vec.Add(bounds.point, new Vec(w, h))
+      ), // Right center
+      Vec.Med(
+        Vec.Add(bounds.point, new Vec(w, h)),
+        Vec.Add(bounds.point, new Vec(0, h))
+      ), // Bottom center
+      Vec.Med(Vec.Add(bounds.point, new Vec(0, h)), bounds.point), // Left center
+      // Corners
+      bounds.point, // Top left
+      Vec.Add(bounds.point, new Vec(w, 0)), // Top right
+      Vec.Add(bounds.point, new Vec(w, h)), // Bottom right
+      Vec.Add(bounds.point, new Vec(0, h)), // Bottom left
+    ];
   }
 
   component(shape: IMapShape) {
@@ -101,7 +128,6 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
           height={bounds.h}
         />
 
-        {/* Search bar */}
         <form
           onSubmit={handleSearch}
           style={{
@@ -151,7 +177,6 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
           </div>
         </form>
 
-        {/* Zoom controls */}
         <div
           style={{
             position: "absolute",
