@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  base: import.meta.env.PROD ? '/tldraw-maplibre-demo/' : '/'
+export default defineConfig(({ mode }) => {
+  const isGitHubPages = mode === 'production'
+  return {
+    plugins: [react()],
+    base: isGitHubPages ? '/tldraw-maplibre-demo/' : '/'
+  }
 })
