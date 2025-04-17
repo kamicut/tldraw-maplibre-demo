@@ -1,7 +1,7 @@
 import "maplibre-gl/dist/maplibre-gl.css"
 import Map, {
   ScaleControl,
-  AttributionControl
+  NavigationControl
 } from 'react-map-gl/maplibre'
 
 import * as React from 'react';
@@ -14,20 +14,52 @@ export function MapComponent({
 }) {
   const mapRef = React.useRef();
   const containerRef = React.useRef();
+  const [viewState, setViewState] = React.useState({
+    longitude: center[0],
+    latitude: center[1],
+    zoom: zoom
+  });
+
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapRef.current) {
+        mapRef.current.resize();
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  const handleMove = (evt) => {
+    setViewState(evt.viewState);
+  };
 
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', height: '100%', position: 'relative' }}
+      style={{
+        width: width || '100%',
+        height: height || '100%',
+        position: 'relative',
+        minHeight: '400px' // Ensure minimum height
+      }}
     >
       <Map
         ref={mapRef}
-        viewState={{
+        initialViewState={{
           longitude: center[0],
           latitude: center[1],
           zoom: zoom
         }}
-        style={{ width, height }}
+        {...viewState}
+        onMove={handleMove}
+        style={{ width: '100%', height: '100%' }}
         mapStyle={{
           version: 8,
           sources: {
@@ -48,16 +80,14 @@ export function MapComponent({
             maxzoom: 19
           }]
         }}
-        reuseMaps={true}
-        trackResize={true}
         interactive={true}
         dragRotate={false}
         doubleClickZoom={true}
         touchZoomRotate={true}
         touchPitch={true}
       >
-        <ScaleControl position="bottom-right" />
-        <AttributionControl position="bottom-left" />
+        <ScaleControl position="bottom-left" />
+        <NavigationControl position="top-right" />
       </Map>
     </div>
   )

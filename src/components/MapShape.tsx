@@ -7,7 +7,6 @@ import {
   getDefaultColorTheme,
   resizeBox,
   Vec,
-  VecLike,
 } from "@tldraw/tldraw";
 import { IMapShape, MapShapeProps } from "./map-shape-types";
 import { mapShapeProps } from "./map-shape-props";
@@ -21,6 +20,7 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
   canEdit = () => true;
   canResize = () => true;
   canRotate = () => false;
+  override canScroll = () => true;
 
   getDefaultProps(): MapShapeProps {
     return {
@@ -65,6 +65,8 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
   }
 
   component(shape: IMapShape) {
+    const isEditing = this.editor.getEditingShapeId() === shape.id;
+
     const bounds = this.editor.getShapeGeometry(shape).bounds;
     const theme = getDefaultColorTheme({
       isDarkMode: this.editor.user.getIsDarkMode(),
@@ -118,8 +120,9 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
           position: "relative",
           overflow: "hidden",
           backgroundColor: theme.background,
-          pointerEvents: "all",
+          pointerEvents: isEditing ? "all" : "none",
         }}
+        onPointerDown={isEditing ? (e) => e.stopPropagation() : undefined}
       >
         <MapComponent
           center={localCenter}
@@ -133,7 +136,7 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
           style={{
             position: "absolute",
             top: 10,
-            right: 10,
+            left: 10,
             zIndex: 1,
             background: "white",
             padding: "8px",
@@ -176,45 +179,6 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
             </button>
           </div>
         </form>
-
-        <div
-          style={{
-            position: "absolute",
-            top: 70, // Position below the search bar
-            right: 10,
-            display: "flex",
-            flexDirection: "column",
-            gap: "5px",
-            zIndex: 1,
-          }}
-        >
-          <button
-            onClick={handleZoomIn}
-            style={{
-              padding: "8px",
-              background: "white",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            +
-          </button>
-          <button
-            onClick={handleZoomOut}
-            style={{
-              padding: "8px",
-              background: "white",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            -
-          </button>
-        </div>
       </HTMLContainer>
     );
   }
