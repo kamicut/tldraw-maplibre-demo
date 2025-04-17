@@ -70,7 +70,7 @@ export function MapComponent({
             'raster-tiles': {
               type: 'raster',
               tiles: [
-                "https://api.mapbox.com/styles/v1/devseed/cm4sj2dh6005b01s80c8t623r/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGV2c2VlZCIsImEiOiJnUi1mbkVvIn0.018aLhX0Mb0tdtaT2QNe2Q"
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
               ],
               tileSize: 256,
               attribution: '© OpenStreetMap contributors'
