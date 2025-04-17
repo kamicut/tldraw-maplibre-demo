@@ -79,16 +79,6 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [searchQuery, setSearchQuery] = useState("");
 
-    const handleZoomIn = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      setLocalZoom((prevZoom) => prevZoom + 1);
-    };
-
-    const handleZoomOut = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      setLocalZoom((prevZoom) => prevZoom - 1);
-    };
-
     const handleSearch = async (e: React.FormEvent) => {
       e.preventDefault();
       e.stopPropagation();
