@@ -20,6 +20,15 @@ export function MapComponent({
     zoom: zoom
   });
 
+  // Update viewState when props change
+  React.useEffect(() => {
+    setViewState({
+      longitude: center[0],
+      latitude: center[1],
+      zoom: zoom
+    });
+  }, [center, zoom, height, width]);
+
   React.useEffect(() => {
     if (!containerRef.current) return;
 
@@ -52,11 +61,6 @@ export function MapComponent({
     >
       <Map
         ref={mapRef}
-        initialViewState={{
-          longitude: center[0],
-          latitude: center[1],
-          zoom: zoom
-        }}
         {...viewState}
         onMove={handleMove}
         style={{ width: '100%', height: '100%' }}

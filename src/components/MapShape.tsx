@@ -92,6 +92,7 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
     const handleSearch = async (e: React.FormEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      console.log("Search initiated with query:", searchQuery);
 
       try {
         const response = await fetch(
@@ -100,11 +101,34 @@ export class MapShapeUtil extends ShapeUtil<IMapShape> {
           )}`
         );
         const data = await response.json();
+        console.log("Search results:", data);
 
         if (data && data.length > 0) {
           const { lat, lon } = data[0];
-          setLocalCenter([parseFloat(lon), parseFloat(lat)]);
-          setLocalZoom(12); // Zoom to a reasonable level for viewing a location
+          const newCenter = [parseFloat(lon), parseFloat(lat)];
+          const newZoom = 12; // Zoom to a reasonable level for viewing a location
+
+          console.log("New center and zoom:", { newCenter, newZoom });
+
+          // Update local state
+          setLocalCenter(newCenter);
+          setLocalZoom(newZoom);
+
+          // Update the shape's props
+          const updatedProps = {
+            ...shape.props,
+            center: newCenter,
+            zoom: newZoom,
+          };
+          console.log("Updating shape with props:", updatedProps);
+
+          this.editor.updateShape<IMapShape>({
+            id: shape.id,
+            type: shape.type,
+            props: updatedProps,
+          });
+        } else {
+          console.log("No search results found");
         }
       } catch (error) {
         console.error("Error searching location:", error);
